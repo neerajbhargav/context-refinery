@@ -2,9 +2,12 @@
 import AppHeader from '@/components/common/AppHeader.vue'
 import StatusBar from '@/components/common/StatusBar.vue'
 import { useSettingsStore } from '@/stores/settings'
-import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { onMounted, computed } from 'vue'
 
 const settings = useSettingsStore()
+const route = useRoute()
+const isSetup = computed(() => route.name === 'setup')
 
 onMounted(() => {
   document.documentElement.className = settings.theme
@@ -13,7 +16,7 @@ onMounted(() => {
 
 <template>
   <div class="flex flex-col h-screen overflow-hidden bg-cr-bg">
-    <AppHeader />
+    <AppHeader v-if="!isSetup" />
     <main class="flex-1 overflow-hidden">
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
@@ -21,7 +24,7 @@ onMounted(() => {
         </transition>
       </router-view>
     </main>
-    <StatusBar />
+    <StatusBar v-if="!isSetup" />
   </div>
 </template>
 

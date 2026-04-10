@@ -1,0 +1,138 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-sidecar:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            ext: .exe
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            ext: ''
+          - os: macos-13
+            target: x86_64-apple-darwin
+            ext: ''
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            ext: ''
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: |
+          cd src-backend
+          pip install -r requirements.txt
+
+      - name: Build sidecar with PyInstaller
+        run: |
+          cd src-backend
+          pyinstaller --onefile --name "context-refinery-api-${{ matrix.target }}${{ matrix.ext }}" \
+            --hidden-import=langchain_google_genai \
+            --hidden-import=langchain_openai \
+            --hidden-import=langchain_anthropic \
+            --hidden-import=langchain_ollama \
+            --hidden-import=langchain_community \
+            --hidden-import=langchain_community.embeddings \
+            --hidden-import=chromadb \
+            --hidden-import=tiktoken \
+            --hidden-import=sentence_transformers \
+            --collect-data chromadb \
+            --collect-data tiktoken \
+            main.py
+          cp dist/context-refinery-api-${{ matrix.target }}${{ matrix.ext }} \
+            ../src-tauri/binaries/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sidecar-${{ matrix.target }}
+          path: src-tauri/binaries/context-refinery-api-*
+
+  build-tauri:
+    needs: build-sidecar
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            sidecar: sidecar-x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            sidecar: sidecar-aarch64-apple-darwin
+          - os: macos-13
+            target: x86_64-apple-darwin
+            sidecar: sidecar-x86_64-apple-darwin
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            sidecar: sidecar-x86_64-unknown-linux-gnu
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Download sidecar binary
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.sidecar }}
+          path: src-tauri/binaries/
+
+      - name: Make sidecar executable
+        if: runner.os != 'Windows'
+        run: chmod +x src-tauri/binaries/context-refinery-api-*
+
+      - name: Install frontend deps
+        run: pnpm install
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'ContextRefinery ${{ github.ref_name }}'
+          releaseBody: |
+            ## Download
+
+            | Platform | File |
+            |----------|------|
+            | Windows | `.msi` or `.exe` installer |
+            | macOS (Apple Silicon) | `.dmg` |
+            | macOS (Intel) | `.dmg` |
+            | Linux | `.deb` or `.AppImage` |
+
+            ### First Run
+            On first launch, a setup wizard will guide you through configuring your AI provider (Ollama for local, or cloud APIs).
+          releaseDraft: true
+          prerelease: false

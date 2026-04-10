@@ -149,13 +149,14 @@ app.add_middleware(
 
 # ── Register Routers ──────────────────────────────────────────────────
 
-from routers import refinery, workbench, eval, models
+from routers import refinery, workbench, eval, models, setup
 
 # ── Routers ─────────────────────────────────────────────────────────
 app.include_router(workbench.router)
 app.include_router(refinery.router)
 app.include_router(eval.router)
 app.include_router(models.router)
+app.include_router(setup.router)
 
 
 # ── Health Check ───────────────────────────────────────────────────────

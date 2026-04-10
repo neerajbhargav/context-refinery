@@ -1,63 +1,101 @@
-# ContextRefinery 💎
-> **The High-Fidelity Context Orchestration Engine**
+# ContextRefinery
 
-Transform messy codebases and complex requirements into context-dense, LLM-optimized prompts. Built for engineers who need local-first intelligence with a premium experience.
+> **AI-powered context orchestration engine** — transforms codebases into LLM-optimized prompts.
 
-## ✨ Premium Features
+## Install
 
-- **Hybrid Retrieval (Dense + Sparse)**: Combines Semantic ChromaDB vector search with BM25 Lexical search for 100% recall.
-- **Cross-Encoder Reranking**: Locally loads the `ms-marco-MiniLM-L-6-v2` model for high-precision context selection.
-- **Local Model Manager**: Dynamic discovery and streaming downloads for any Ollama model directly from the UI.
-- **Refinement Pipeline**: Multi-agent LangGraph orchestration that iteratively optimizes prompts within your token budget.
-- **Power-User UX**: Glassmorphism design system, Focus Mode (`Ctrl+B`), and multi-format export (Markdown, XML, JSON).
+### Windows (one command)
 
-## 🏗️ Architecture
-
-```mermaid
-graph TD
-    UI[Vue 3 + Tailwind v3] --- Sidecar[FastAPI Python Sidecar]
-    Sidecar --- Agents[LangGraph Agents]
-    Sidecar --- Retrieval[Hybrid Retriever]
-    Retrieval --- ChromaDB[Dense Search]
-    Retrieval --- BM25[Lexical Search]
-    Sidecar --- Ollama[Local Models]
+```powershell
+irm https://raw.githubusercontent.com/neerajbhargav/context-refinery/master/install.ps1 | iex
 ```
 
-## 🚀 Quick Start
+### Mac / Linux (one command)
 
-### 1. Requirements
-- **Node.js** ≥ 18 (with pnpm)
-- **Python** ≥ 3.11
-- **Rust** ≥ 1.77 (with MSVC Build Tools on Windows)
-- **Ollama** (optional, for local models) — [ollama.com](https://ollama.com)
-
-### 2. Sidecar Setup
 ```bash
+curl -fsSL https://raw.githubusercontent.com/neerajbhargav/context-refinery/master/install.sh | bash
+```
+
+This installs everything, creates a desktop shortcut (Windows) or app entry (Mac/Linux), and launches the setup wizard.
+
+### Desktop App (pre-built)
+
+Download the latest `.exe` / `.dmg` / `.AppImage` from [Releases](https://github.com/neerajbhargav/context-refinery/releases).
+
+### Manual
+
+```bash
+git clone https://github.com/neerajbhargav/context-refinery.git
+cd context-refinery
+
+# Backend
 cd src-backend
 python -m venv .venv
-# Activate venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env # Add your Google/OpenAI keys
-python main.py
-```
+cp .env.example .env
+python main.py              # Starts on :8741
 
-### 3. Frontend Setup
-```bash
+# Frontend (new terminal)
+cd ..
 pnpm install
-pnpm tauri dev # Or pnpm dev for web-only
+pnpm dev                    # Opens on :1420
 ```
 
-## ⚙️ Environment Variables
+### Requirements
 
-Located in `src-backend/.env`:
-- `GOOGLE_API_KEY`: Required for Gemini (Recommended default).
-- `DEFAULT_LLM_PROVIDER`: Set to `ollama` for total local privacy.
-- `CHROMA_PERSIST_DIRECTORY`: Default is `~/.context-refinery/chroma`.
+- **Python** >= 3.11
+- **Node.js** >= 18 (with pnpm)
+- **Rust** >= 1.77 (only for `tauri build` — not needed for dev mode)
+- **Ollama** (optional, for local models) — [ollama.com](https://ollama.com)
 
-## ⌨️ Shortcuts
-- `Ctrl + Enter`: Refine Prompt
-- `Ctrl + B`: Toggle File Sidebar
-- `Ctrl + S`: Settings
+## First Run
 
-## 📜 License
+On first launch, a **setup wizard** walks you through:
+
+1. **Choose your AI provider** — Ollama (local, recommended), Google Gemini, OpenAI, or Anthropic
+2. **Configure** — pull an Ollama model or enter your API key
+3. **Test connection** — verify everything works
+4. **Launch** — start using ContextRefinery
+
+You can change providers anytime in Settings.
+
+## Features
+
+- **Hybrid Retrieval**: ChromaDB vector search + BM25 lexical search + Reciprocal Rank Fusion
+- **Cross-Encoder Reranking**: `ms-marco-MiniLM-L-6-v2` for high-precision context selection
+- **LangGraph Pipeline**: Multi-agent orchestration (intent analysis, retrieval, refinement, evaluation)
+- **Iterative Refinement**: Automatically re-refines if eval score < threshold (up to 3 iterations)
+- **Token Budget Control**: Logarithmic slider from 512 to 32K tokens
+- **Multi-Provider**: Google Gemini, OpenAI GPT-4o, Anthropic Claude, Ollama (local)
+- **Local Model Manager**: Pull/delete Ollama models from the UI with streaming progress
+- **Multi-Format Export**: Markdown, XML, JSON
+- **Keyboard Shortcuts**: `Ctrl+Enter` (refine), `Ctrl+B` (toggle sidebar), `Ctrl+S` (settings)
+
+## Architecture
+
+```
+Vue 3 + Tailwind ──► FastAPI Sidecar ──► LangGraph Pipeline
+  (Tauri shell)         :8741              Intent → Retrieve → Refine → Eval
+                          │
+                    ┌─────┼─────┐
+                 ChromaDB  BM25  Cross-Encoder
+                 (dense)  (sparse) (reranker)
+```
+
+## Environment Variables
+
+In `src-backend/.env` (auto-configured by setup wizard):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DEFAULT_LLM_PROVIDER` | `google` | `ollama` / `google` / `openai` / `anthropic` |
+| `GOOGLE_API_KEY` | — | Required if using Google Gemini |
+| `OPENAI_API_KEY` | — | Required if using OpenAI |
+| `ANTHROPIC_API_KEY` | — | Required if using Anthropic |
+| `EMBEDDING_PROVIDER` | `google` | `google` / `ollama` / `sentence-transformers` |
+| `OLLAMA_MODEL` | `gemma3` | Default Ollama model |
+
+## License
+
 MIT
