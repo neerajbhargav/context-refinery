@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Build outputs
+dist/
+build/
+target/
+*.spec
+
+# Tauri
+src-tauri/target/
+src-tauri/binaries/context-refinery-api-*
+
+# PyInstaller
+src-backend/dist/
+src-backend/build/
+
+# Environment
+.env
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code
+.claude/
+
+# ChromaDB local data
+.context-refinery/

@@ -1,0 +1,19 @@
+[project]
+name = "context-refinery-backend"
+version = "0.1.0"
+description = "ContextRefinery — AI-powered prompt refinement sidecar"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "ContextRefinery" }]
+
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

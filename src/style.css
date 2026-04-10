@@ -1,0 +1,261 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Material Design 3 Inspired Design System ───────── */
+
+:root {
+  /* Brand Constants */
+  --color-primary: 262 80% 50%;
+  --color-primary-container: 262 60% 92%;
+  --color-on-primary: 0 0% 100%;
+  --color-on-primary-container: 262 80% 20%;
+
+  --color-success: 142 70% 45%;
+  --color-error: 0 75% 55%;
+  --color-warn: 38 92% 50%;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --duration-short: 150ms;
+  --duration-medium: 300ms;
+}
+
+/* ── Dark Theme (Default) ── */
+.dark, :root:not(.light) {
+  --color-cr-bg: 220 15% 8%;
+  --color-cr-bg-soft: 220 13% 12%;
+  --color-cr-surface: 220 13% 14%;
+  --color-cr-surface-variant: 220 12% 18%;
+  --color-cr-text: 220 10% 93%;
+  --color-cr-text-dim: 220 8% 55%;
+  --color-cr-border: 220 10% 20%;
+  --color-cr-outline: 220 10% 25%;
+
+  color-scheme: dark;
+}
+
+/* ── Light Theme ── */
+.light {
+  --color-cr-bg: 220 20% 97%;
+  --color-cr-bg-soft: 0 0% 100%;
+  --color-cr-surface: 0 0% 100%;
+  --color-cr-surface-variant: 220 20% 95%;
+  --color-cr-text: 220 15% 12%;
+  --color-cr-text-dim: 220 8% 45%;
+  --color-cr-border: 220 15% 88%;
+  --color-cr-outline: 220 10% 80%;
+
+  color-scheme: light;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #app {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', 'Google Sans', system-ui, -apple-system, sans-serif;
+  background-color: hsl(var(--color-cr-bg));
+  color: hsl(var(--color-cr-text));
+  -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── Component Layer ────────────────────────────────────────── */
+
+@layer components {
+  /* Surface cards — like Google's elevated cards */
+  .surface-card {
+    @apply rounded-2xl border transition-all;
+    background: hsl(var(--color-cr-surface));
+    border-color: hsl(var(--color-cr-border));
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  }
+
+  .surface-card-elevated {
+    @apply rounded-2xl border transition-all;
+    background: hsl(var(--color-cr-surface));
+    border-color: hsl(var(--color-cr-border));
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  }
+
+  /* Keep glass-panel as alias for backwards compat */
+  .glass-panel {
+    @apply surface-card;
+  }
+
+  .glass-surface {
+    @apply rounded-xl border transition-colors;
+    background: hsl(var(--color-cr-surface-variant));
+    border-color: hsl(var(--color-cr-border));
+  }
+
+  /* ── Buttons — large touch targets, Google style ──────── */
+
+  .btn-primary {
+    @apply relative overflow-hidden px-6 py-3 rounded-full font-semibold text-sm
+           bg-accent-600 text-white
+           shadow-sm hover:shadow-md
+           transition-all duration-200
+           hover:bg-accent-500 active:scale-[0.97]
+           disabled:opacity-40 disabled:pointer-events-none cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-full font-semibold text-sm
+           border border-cr-outline
+           hover:bg-accent-50 hover:border-accent-300
+           dark:hover:bg-accent-950 dark:hover:border-accent-700
+           text-cr-text transition-all duration-200
+           active:scale-[0.97] cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 rounded-full font-medium text-sm
+           text-cr-text-dim hover:text-cr-text
+           hover:bg-cr-surface-variant
+           transition-all duration-150 cursor-pointer;
+  }
+
+  .btn-icon {
+    @apply p-2.5 rounded-full
+           text-cr-text-dim hover:text-cr-text
+           hover:bg-cr-surface-variant
+           transition-all duration-150 cursor-pointer
+           flex items-center justify-center;
+  }
+
+  /* ── Status Badges ───────────────────────────────────── */
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply badge bg-emerald-500/10 text-emerald-600 dark:text-emerald-400;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-500/10 text-amber-600 dark:text-amber-400;
+  }
+
+  .badge-error {
+    @apply badge bg-red-500/10 text-red-600 dark:text-red-400;
+  }
+
+  .badge-info {
+    @apply badge bg-blue-500/10 text-blue-600 dark:text-blue-400;
+  }
+
+  /* ── Code Blocks ─────────────────────────────────────── */
+
+  .code-block {
+    @apply rounded-xl font-mono text-[13px] leading-relaxed p-5 overflow-auto;
+    background: hsl(var(--color-cr-surface-variant));
+    color: hsl(var(--color-cr-text));
+  }
+
+  .score-ring {
+    @apply relative flex items-center justify-center;
+  }
+  .score-ring svg circle {
+    transition: stroke-dashoffset 0.6s var(--ease-emphasized);
+  }
+
+  /* ── Form Inputs — Google style ─────────────────────── */
+
+  .input-field {
+    @apply w-full rounded-xl border px-4 py-3 text-sm
+           outline-none transition-all duration-200;
+    background: hsl(var(--color-cr-surface));
+    border-color: hsl(var(--color-cr-outline));
+    color: hsl(var(--color-cr-text));
+  }
+  .input-field::placeholder {
+    color: hsl(var(--color-cr-text-dim));
+  }
+  .input-field:focus {
+    border-color: hsl(var(--color-primary));
+    box-shadow: 0 0 0 1px hsl(var(--color-primary));
+  }
+}
+
+/* ── Semantic color utilities for CSS variable based colors ── */
+
+@layer utilities {
+  .bg-cr-bg { background-color: hsl(var(--color-cr-bg)); }
+  .bg-cr-bg-soft { background-color: hsl(var(--color-cr-bg-soft)); }
+  .bg-cr-surface { background-color: hsl(var(--color-cr-surface)); }
+  .bg-cr-surface-variant { background-color: hsl(var(--color-cr-surface-variant)); }
+  .text-cr-text { color: hsl(var(--color-cr-text)); }
+  .text-cr-text-dim { color: hsl(var(--color-cr-text-dim)); }
+  .border-cr-border { border-color: hsl(var(--color-cr-border)); }
+  .border-cr-outline { border-color: hsl(var(--color-cr-outline)); }
+}
+
+/* ── Animations ─────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 25%,
+    hsl(var(--color-cr-surface-variant)) 50%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes thinking-dots {
+  0%, 20% { opacity: 0.3; }
+  50% { opacity: 1; }
+  80%, 100% { opacity: 0.3; }
+}
+
+.thinking-dot {
+  animation: thinking-dots 1.4s infinite;
+}
+.thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Focus Styles (WCAG 2.1 AA) ────────────────────────── */
+
+*:focus-visible {
+  outline: 2px solid hsl(var(--color-primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Selection ──────────────────────────────────────────── */
+
+::selection {
+  background: hsl(var(--color-primary) / 0.25);
+}
+
+/* ── Scrollbar — thin, subtle ───────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--color-cr-outline));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--color-cr-text-dim));
+}
