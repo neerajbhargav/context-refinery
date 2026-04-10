@@ -29,7 +29,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["nsis", "msi"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -39,6 +39,19 @@
     ],
     "externalBin": [
       "binaries/context-refinery-api"
-    ]
+    ],
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "headerImage": null,
+        "sidebarImage": null
+      }
+    },
+    "shortDescription": "AI-powered context orchestration engine",
+    "longDescription": "ContextRefinery transforms codebases into LLM-optimized prompts using hybrid retrieval, cross-encoder reranking, and multi-agent refinement. Supports Google Gemini, OpenAI, Anthropic, and local Ollama models.",
+    "copyright": "Copyright 2025 ContextRefinery",
+    "category": "DeveloperTool",
+    "publisher": "ContextRefinery"
   }
 }
