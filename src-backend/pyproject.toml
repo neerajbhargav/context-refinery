@@ -7,6 +7,9 @@ requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "ContextRefinery" }]
 
+[project.optional-dependencies]
+eval = ["deepeval>=2.9.0", "ragas>=0.2.0"]
+
 [build-system]
 requires = ["setuptools>=75.0", "wheel"]
 build-backend = "setuptools.build_meta"

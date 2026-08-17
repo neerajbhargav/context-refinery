@@ -65,7 +65,7 @@ You can change providers anytime in Settings.
 - **Hybrid Retrieval**: ChromaDB vector search + BM25 lexical search + Reciprocal Rank Fusion
 - **Cross-Encoder Reranking**: `ms-marco-MiniLM-L-6-v2` for high-precision context selection
 - **LangGraph Pipeline**: Multi-agent orchestration (intent analysis, retrieval, refinement, evaluation)
-- **Iterative Refinement**: Automatically re-refines if eval score < threshold (up to 3 iterations)
+- **Iterative Refinement**: Automatically re-refines if eval score < threshold (up to 3 iterations). Local metrics (n-gram grounding, information density, budget utilization) always run; optional DeepEval + RAGAS activate when a cloud API key is set and `pip install 'deepeval>=2.9' 'ragas>=0.2'`.
 - **Token Budget Control**: Logarithmic slider from 512 to 32K tokens
 - **Multi-Provider**: Google Gemini, OpenAI GPT-4o, Anthropic Claude, Ollama (local)
 - **Local Model Manager**: Pull/delete Ollama models from the UI with streaming progress

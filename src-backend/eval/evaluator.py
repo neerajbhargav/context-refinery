@@ -5,7 +5,8 @@ Scores a refined prompt for context grounding, information density,
 and budget utilization. Uses lightweight heuristic scoring that
 works locally without an external LLM dependency.
 
-Optional RAGAS integration available when an API key is configured.
+Optional DeepEval / RAGAS integration runs when a cloud API key is
+configured and the optional extras are installed. Local metrics always run.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from eval.metrics import (
     compute_information_density,
     compute_budget_utilization,
 )
+from eval.llm_metrics import maybe_llm_eval
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -64,24 +66,39 @@ async def evaluate_prompt(
 
     passed = overall >= settings.EVAL_GROUNDING_THRESHOLD
 
+    details = {
+        "prompt_tokens": count_tokens(prompt),
+        "budget": token_budget,
+        "threshold": settings.EVAL_GROUNDING_THRESHOLD,
+        "context_chunks_used": len(context_chunks),
+        "local_overall": round(overall, 4),
+    }
+
+    llm_scores = await maybe_llm_eval(prompt, context_chunks, goal)
+    if llm_scores:
+        details["llm_eval"] = llm_scores
+        llm_avg = (
+            float(llm_scores.get("faithfulness") or 0.0)
+            + float(llm_scores.get("answer_relevancy") or 0.0)
+        ) / 2.0
+        details["llm_overall"] = round(llm_avg, 4)
+        overall = 0.5 * overall + 0.5 * llm_avg
+        passed = overall >= settings.EVAL_GROUNDING_THRESHOLD
+
     scores = EvalScores(
         context_grounding=round(grounding, 4),
         budget_utilization=round(utilization, 4),
         information_density=round(density, 4),
         overall_score=round(overall, 4),
         passed=passed,
-        details={
-            "prompt_tokens": count_tokens(prompt),
-            "budget": token_budget,
-            "threshold": settings.EVAL_GROUNDING_THRESHOLD,
-            "context_chunks_used": len(context_chunks),
-        },
+        details=details,
     )
 
     logger.info(
         f"Eval: grounding={grounding:.2%} density={density:.2%} "
         f"utilization={utilization:.2%} overall={overall:.2%} "
         f"{'PASS' if passed else 'FAIL'}"
+        + (f" llm={details.get('llm_eval', {}).get('backend')}" if llm_scores else " llm=off")
     )
 
     return scores
