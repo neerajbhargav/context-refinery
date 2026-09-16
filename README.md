@@ -10,17 +10,17 @@
 irm https://raw.githubusercontent.com/neerajbhargav/context-refinery/master/install.ps1 | iex
 ```
 
-### Mac / Linux (one command)
+### Mac / Linux (source installer)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/neerajbhargav/context-refinery/master/install.sh | bash
 ```
 
-This installs everything, creates a desktop shortcut (Windows) or app entry (Mac/Linux), and launches the setup wizard.
+These scripts install from source after checking prerequisites, create a desktop shortcut (Windows) or app entry (Mac/Linux), and launch the setup wizard.
 
 ### Desktop App (pre-built)
 
-Download the latest `.exe` / `.dmg` / `.AppImage` from [Releases](https://github.com/neerajbhargav/context-refinery/releases).
+The published `v0.1.0` release provides **Windows x64 only**: `.exe` and `.msi` installers in [Releases](https://github.com/neerajbhargav/context-refinery/releases) (checked September 16, 2026). No macOS or Linux binaries are currently published; use the source installer or manual setup on those platforms. The cross-platform release workflow is not evidence of published binaries.
 
 ### Manual
 
@@ -65,7 +65,7 @@ You can change providers anytime in Settings.
 - **Hybrid Retrieval**: ChromaDB vector search + BM25 lexical search + Reciprocal Rank Fusion
 - **Cross-Encoder Reranking**: `ms-marco-MiniLM-L-6-v2` for high-precision context selection
 - **LangGraph Pipeline**: Multi-agent orchestration (intent analysis, retrieval, refinement, evaluation)
-- **Iterative Refinement**: Automatically re-refines if eval score < threshold (up to 3 iterations). Local metrics (n-gram grounding, information density, budget utilization) always run; optional DeepEval + RAGAS activate when a cloud API key is set and `pip install 'deepeval>=2.9' 'ragas>=0.2'`.
+- **Iterative Refinement**: Automatically re-refines if eval score < threshold (up to 3 iterations). Local metrics (n-gram grounding, information density, budget utilization) always run for non-empty prompts. The optional evaluator uses the libraries' default OpenAI-backed configuration: set `OPENAI_API_KEY` and install `deepeval>=2.9` and/or `ragas>=0.2` (RAGAS also requires `datasets`). DeepEval is tried first; RAGAS is tried when DeepEval is unavailable, not after a DeepEval runtime failure. Missing dependencies or runtime failures leave local scoring in place. The activation gate accepts any configured cloud key, but this path does not configure Google or Anthropic evaluator models.
 - **Token Budget Control**: Logarithmic slider from 512 to 32K tokens
 - **Multi-Provider**: Google Gemini, OpenAI GPT-4o, Anthropic Claude, Ollama (local)
 - **Local Model Manager**: Pull/delete Ollama models from the UI with streaming progress
